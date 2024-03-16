@@ -36,7 +36,7 @@ const getUserById = async (id: number): Promise<UserWithNoPassword | null> => {
   }
 };
 
-const getAllusers = async (): Promise<UserWithNoPassword[] | null> => {
+const getAllUsers = async (): Promise<UserWithNoPassword[] | null> => {
   try {
     const [rows] = await promisePool.execute<
       RowDataPacket[] & UserWithNoPassword[]
@@ -220,7 +220,7 @@ const deleteUser = async (id: number): Promise<UserDeleteResponse | null> => {
 
 export {
   getUserById,
-  getAllusers,
+  getAllUsers,
   getUserByEmail,
   getUserByUsername,
   createUser,
