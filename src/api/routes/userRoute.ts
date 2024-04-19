@@ -3,6 +3,8 @@ import {
   checkEmailExists,
   checkToken,
   checkUsernameExists,
+  getDistance,
+  updateDistance,
   userDelete,
   userDeleteAsAdmin,
   userGet,
@@ -351,5 +353,9 @@ router.get(
   param('username').isString().escape(),
   checkUsernameExists
 );
+
+router.put('/:id/distance', updateDistance); //update distance traveled in database
+
+router.get('/:id/distance', getDistance); // get distance traveled from database
 
 export default router;

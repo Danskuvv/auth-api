@@ -218,6 +218,40 @@ const deleteUser = async (id: number): Promise<UserDeleteResponse | null> => {
   }
 };
 
+const updateDistanceTraveled = async (
+  userId: number,
+  distance: number
+): Promise<boolean> => {
+  try {
+    const result = await promisePool.execute<ResultSetHeader>(
+      'UPDATE users SET distance_traveled = ? WHERE user_id = ?',
+      [distance, userId]
+    );
+
+    return result[0].affectedRows > 0;
+  } catch (e) {
+    console.error('updateDistanceTraveled error', (e as Error).message);
+    throw new Error((e as Error).message);
+  }
+};
+
+const getDistanceTraveled = async (userId: number): Promise<number | null> => {
+  try {
+    const [rows] = await promisePool.execute<
+      RowDataPacket[] & {distance_traveled: number}[]
+    >('SELECT distance_traveled FROM users WHERE user_id = ?', [userId]);
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return rows[0].distance_traveled;
+  } catch (e) {
+    console.error('getDistanceTraveled error', (e as Error).message);
+    throw new Error((e as Error).message);
+  }
+};
+
 export {
   getUserById,
   getAllUsers,
@@ -226,4 +260,6 @@ export {
   createUser,
   modifyUser,
   deleteUser,
+  updateDistanceTraveled,
+  getDistanceTraveled,
 };

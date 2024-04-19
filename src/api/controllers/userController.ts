@@ -11,10 +11,12 @@ import {
   createUser,
   deleteUser,
   getAllUsers,
+  getDistanceTraveled,
   getUserByEmail,
   getUserById,
   getUserByUsername,
   modifyUser,
+  updateDistanceTraveled,
 } from '../models/userModel';
 import {
   TokenContent,
@@ -322,6 +324,71 @@ const checkUsernameExists = async (
   }
 };
 
+const updateDistance = async (
+  req: Request<{id: string}, {}, {distance: number}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('updateDistanceTraveled validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
+
+  try {
+    const userId = Number(req.params.id);
+    const {distance} = req.body;
+
+    const success = await updateDistanceTraveled(userId, distance);
+
+    if (!success) {
+      next(new CustomError('User not found', 404));
+      return;
+    }
+
+    res.json({message: 'Distance traveled updated'});
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
+const getDistance = async (
+  req: Request<{id: string}>,
+  res: Response<{distance: number}>,
+  next: NextFunction
+) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('getDistanceTraveled validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
+
+  try {
+    const userId = Number(req.params.id);
+
+    const distance = await getDistanceTraveled(userId);
+
+    if (distance === null) {
+      next(new CustomError('User not found', 404));
+      return;
+    }
+
+    res.json({distance});
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
 export {
   userListGet,
   userGet,
@@ -333,4 +400,6 @@ export {
   checkToken,
   checkEmailExists,
   checkUsernameExists,
+  updateDistance,
+  getDistance,
 };
