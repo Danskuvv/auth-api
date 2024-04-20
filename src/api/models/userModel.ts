@@ -137,7 +137,22 @@ const createUser = async (user: User): Promise<UserWithNoPassword | null> => {
       return null;
     }
 
-    const newUser = await getUserById(result[0].insertId);
+    const userId = result[0].insertId;
+
+    // Get all quests
+    const [quests] = await promisePool.execute<RowDataPacket[]>(
+      'SELECT quest_id FROM quests'
+    );
+
+    // Insert a new record into the userquests table for each quest
+    for (const quest of quests) {
+      await promisePool.execute<ResultSetHeader>(
+        'INSERT INTO userquests (user_id, quest_id, claimed) VALUES (?, ?, 0)',
+        [userId, quest.quest_id]
+      );
+    }
+
+    const newUser = await getUserById(userId);
     return newUser;
   } catch (e) {
     console.error('createUser error', (e as Error).message);
