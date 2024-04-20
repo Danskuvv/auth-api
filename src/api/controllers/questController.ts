@@ -83,7 +83,13 @@ const userQuestPut = async (
   next: NextFunction
 ) => {
   try {
-    await claimUserQuest(Number(req.params.id), req.body.quest_id);
+    const userId = Number(req.params.id);
+    const questId = req.body.quest_id;
+    if (userId === undefined || questId === undefined) {
+      next(new CustomError('User ID or Quest ID is missing', 400));
+      return;
+    }
+    await claimUserQuest(userId, questId);
     res.json({message: 'Quest claimed'});
   } catch (error) {
     next(new CustomError((error as Error).message, 500));
