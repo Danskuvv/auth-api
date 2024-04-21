@@ -55,6 +55,23 @@ const claimUserQuest = async (
   );
 };
 
-export {getUserQuests, addUserQuest, claimUserQuest};
+const getQuestCoinReward = async (questId: number): Promise<number | null> => {
+  try {
+    const [rows] = await promisePool.execute<
+      RowDataPacket[] & {coin_reward: number}[]
+    >('SELECT coin_reward FROM quests WHERE quest_id = ?', [questId]);
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return rows[0].coin_reward;
+  } catch (e) {
+    console.error('getQuestCoinReward error', (e as Error).message);
+    throw new Error((e as Error).message);
+  }
+};
+
+export {getUserQuests, addUserQuest, claimUserQuest, getQuestCoinReward};
 
 export {getAllQuests, getQuestById};

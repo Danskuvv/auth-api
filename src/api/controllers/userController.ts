@@ -15,8 +15,10 @@ import {
   getUserByEmail,
   getUserById,
   getUserByUsername,
+  getUserCoins,
   modifyUser,
   updateDistanceTraveled,
+  updateUserCoins,
 } from '../models/userModel';
 import {
   TokenContent,
@@ -389,6 +391,49 @@ const getDistance = async (
   }
 };
 
+const getUserCoinsController = async (
+  req: Request<{id: string}>,
+  res: Response<{coins: number}>,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(req.params.id);
+
+    const coins = await getUserCoins(userId);
+
+    if (coins === null) {
+      next(new CustomError('User not found', 404));
+      return;
+    }
+
+    res.json({coins});
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
+const updateUserCoinsController = async (
+  req: Request<{id: string}, {}, {coins: number}>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(req.params.id);
+    const {coins} = req.body;
+
+    const success = await updateUserCoins(userId, coins);
+
+    if (!success) {
+      next(new CustomError('User not found', 404));
+      return;
+    }
+
+    res.json({message: 'Coins updated'});
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
 export {
   userListGet,
   userGet,
@@ -402,4 +447,6 @@ export {
   checkUsernameExists,
   updateDistance,
   getDistance,
+  getUserCoinsController,
+  updateUserCoinsController,
 };

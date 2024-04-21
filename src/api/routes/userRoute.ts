@@ -4,7 +4,9 @@ import {
   checkToken,
   checkUsernameExists,
   getDistance,
+  getUserCoinsController,
   updateDistance,
+  updateUserCoinsController,
   userDelete,
   userDeleteAsAdmin,
   userGet,
@@ -358,4 +360,7 @@ router.put('/:id/distance', updateDistance); //update distance traveled in datab
 
 router.get('/:id/distance', getDistance); // get distance traveled from database
 
+router.get('/:id/coins', getUserCoinsController); // get user coins from database
+
+router.put('/:id/coins', updateUserCoinsController); // update user coins in database
 export default router;

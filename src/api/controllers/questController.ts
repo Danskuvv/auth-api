@@ -1,7 +1,11 @@
 // questController.ts
 import {NextFunction, Request, Response} from 'express';
 import CustomError from '../../classes/CustomError';
-import {getAllQuests, getQuestById} from '../models/questModel';
+import {
+  getAllQuests,
+  getQuestById,
+  getQuestCoinReward,
+} from '../models/questModel';
 import {
   getUserQuests,
   addUserQuest,
@@ -96,4 +100,32 @@ const userQuestPut = async (
   }
 };
 
-export {questListGet, questGet, userQuestsGet, userQuestPost, userQuestPut};
+const getQuestCoinRewardController = async (
+  req: Request<{id: string}>,
+  res: Response<{coin_reward: number}>,
+  next: NextFunction
+) => {
+  try {
+    const questId = Number(req.params.id);
+
+    const coin_reward = await getQuestCoinReward(questId);
+
+    if (coin_reward === null) {
+      next(new CustomError('Quest not found', 404));
+      return;
+    }
+
+    res.json({coin_reward});
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
+export {
+  questListGet,
+  questGet,
+  userQuestsGet,
+  userQuestPost,
+  userQuestPut,
+  getQuestCoinRewardController,
+};

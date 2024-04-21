@@ -267,6 +267,40 @@ const getDistanceTraveled = async (userId: number): Promise<number | null> => {
   }
 };
 
+const getUserCoins = async (userId: number): Promise<number | null> => {
+  try {
+    const [rows] = await promisePool.execute<
+      RowDataPacket[] & {coins: number}[]
+    >('SELECT coins FROM users WHERE user_id = ?', [userId]);
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return rows[0].coins;
+  } catch (e) {
+    console.error('getUserCoins error', (e as Error).message);
+    throw new Error((e as Error).message);
+  }
+};
+
+const updateUserCoins = async (
+  userId: number,
+  coins: number
+): Promise<boolean> => {
+  try {
+    const result = await promisePool.execute<ResultSetHeader>(
+      'UPDATE users SET coins = coins + ? WHERE user_id = ?',
+      [coins, userId]
+    );
+
+    return result[0].affectedRows > 0;
+  } catch (e) {
+    console.error('updateUserCoins error', (e as Error).message);
+    throw new Error((e as Error).message);
+  }
+};
+
 export {
   getUserById,
   getAllUsers,
@@ -277,4 +311,6 @@ export {
   deleteUser,
   updateDistanceTraveled,
   getDistanceTraveled,
+  getUserCoins,
+  updateUserCoins,
 };
