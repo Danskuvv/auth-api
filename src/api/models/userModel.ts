@@ -160,7 +160,7 @@ const createUser = async (user: User): Promise<UserWithNoPassword | null> => {
     // Insert a new record into the userimagequests table for each image quest
     for (const quest of imageQuests) {
       await promisePool.execute<ResultSetHeader>(
-        'INSERT INTO userimagequests (user_id, quest_id, claimed) VALUES (?, ?, 0)',
+        'INSERT INTO userimagequests (user_id, quest_id, claimed, completed) VALUES (?, ?, 0, 0)',
         [userId, quest.quest_id]
       );
     }
