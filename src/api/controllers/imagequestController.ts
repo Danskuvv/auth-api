@@ -2,9 +2,11 @@
 import {NextFunction, Request, Response} from 'express';
 import CustomError from '../../classes/CustomError';
 import {
+  completeUserImageQuest,
   getAllImageQuests,
   getImageQuestById,
   getImageQuestCoinReward,
+  getUserImageQuest,
 } from '../models/imagequestModel';
 import {
   getUserImageQuests,
@@ -121,6 +123,42 @@ const getImageQuestCoinRewardController = async (
   }
 };
 
+const getUserImageQuestController = async (
+  req: Request<{userId: string; questId: string}>,
+  res: Response<UserImageQuest>,
+  next: NextFunction
+) => {
+  try {
+    const userImageQuest = await getUserImageQuest(
+      Number(req.params.userId),
+      Number(req.params.questId)
+    );
+    if (!userImageQuest) {
+      next(new CustomError('User Image Quest not found', 404));
+      return;
+    }
+    res.json(userImageQuest);
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
+const completeUserImageQuestController = async (
+  req: Request<{userId: string; questId: string}>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await completeUserImageQuest(
+      Number(req.params.userId),
+      Number(req.params.questId)
+    );
+    res.json({message: 'User Image Quest completed'});
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
 export {
   imagequestListGet,
   imagequestGet,
@@ -128,4 +166,6 @@ export {
   userImageQuestPost,
   userImageQuestPut,
   getImageQuestCoinRewardController,
+  getUserImageQuestController,
+  completeUserImageQuestController,
 };

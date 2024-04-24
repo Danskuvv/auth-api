@@ -7,6 +7,8 @@ import {
   userImageQuestPost,
   userImageQuestPut,
   getImageQuestCoinRewardController,
+  getUserImageQuestController,
+  completeUserImageQuestController,
 } from '../controllers/imagequestController';
 import {authenticate} from '../../middlewares';
 import {param} from 'express-validator';
@@ -37,6 +39,22 @@ router.get(
   '/:id/coin_reward',
   param('id').isNumeric(),
   getImageQuestCoinRewardController
+);
+
+router.get(
+  '/user/:userId/quest/:questId',
+  authenticate,
+  param('userId').isNumeric(),
+  param('questId').isNumeric(),
+  getUserImageQuestController
+);
+
+router.put(
+  '/user/:userId/quest/:questId',
+  authenticate,
+  param('userId').isNumeric(),
+  param('questId').isNumeric(),
+  completeUserImageQuestController
 );
 
 export default router;

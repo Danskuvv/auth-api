@@ -79,11 +79,34 @@ const getImageQuestCoinReward = async (
   }
 };
 
+const getUserImageQuest = async (
+  userId: number,
+  questId: number
+): Promise<UserImageQuest | null> => {
+  const [rows] = await promisePool.execute<RowDataPacket[] & UserImageQuest[]>(
+    'SELECT * FROM userimagequests WHERE user_id = ? AND quest_id = ?',
+    [userId, questId]
+  );
+  return rows[0] || null;
+};
+
+const completeUserImageQuest = async (
+  userId: number,
+  questId: number
+): Promise<void> => {
+  await promisePool.execute<ResultSetHeader>(
+    'UPDATE userimagequests SET completed = 1 WHERE user_id = ? AND quest_id = ?',
+    [userId, questId]
+  );
+};
+
 export {
   getUserImageQuests,
   addUserImageQuest,
   claimUserImageQuest,
   getImageQuestCoinReward,
+  getUserImageQuest,
+  completeUserImageQuest,
 };
 
 export {getAllImageQuests, getImageQuestById};
